@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Understanding Java Environment: JDK vs JRE</title>
+    <style>
+        :root {
+            --primary: #f89820;
+            --secondary: #5382a1;
+            --dark: #24292e;
+            --light: #f6f8fa;
+            --text: #333333;
+            --card-bg: #ffffff;
+            --shadow: 0 4px 6px rgba(0,0,0,0.07);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--text);
+            line-height: 1.6;
+            padding-bottom: 60px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--dark) 0%, #1a1e22 100%);
+            color: white;
+            text-align: center;
+            padding: 50px 20px;
+            border-bottom: 5px solid var(--primary);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: #a0a6ac;
+            font-size: 1.1rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Visual Architecture Box */
+        .architecture-box {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 40px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .arch-title {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--dark);
+        }
+
+        .nested-box {
+            border-radius: 6px;
+            padding: 20px;
+            margin: 15px 0;
+            transition: transform 0.2s;
+        }
+
+        .nested-box:hover {
+            transform: translateY(-2px);
+        }
+
+        .jdk-box {
+            background-color: rgba(248, 152, 32, 0.1);
+            border: 2px dashed var(--primary);
+        }
+
+        .jre-box {
+            background-color: rgba(83, 130, 161, 0.1);
+            border: 2px dashed var(--secondary);
+            margin-left: 20px;
+        }
+
+        .jvm-box {
+            background-color: #e1e4e8;
+            border: 2px solid #959da5;
+            margin-left: 40px;
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .badge-jdk { background-color: var(--primary); }
+        .badge-jre { background-color: var(--secondary); }
+        .badge-jvm { background-color: #586069; }
+
+        /* Grid Comparison */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
+            .jre-box, .jvm-box { margin-left: 0; }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            border-top: 4px solid var(--primary);
+        }
+
+        .card.jre-card {
+            border-top-color: var(--secondary);
+        }
+
+        .card h2 {
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .card ul {
+            list-style-type: none;
+        }
+
+        .card li {
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .card li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: green;
+            font-weight: bold;
+        }
+
+        /* Code & Example Section */
+        .example-section {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e1e4e8;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #586069;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        pre {
+            background-color: var(--dark);
+            color: #f6f8fa;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+        }
+
+        .keyword { color: #ff7b72; }
+        .class-name { color: #ffa657; }
+        .string { color: #a5d6ff; }
+        .comment { color: #8b949e; }
+
+        .env-notes {
+            background-color: #fff9e6;
+            border-left: 4px solid #f1c40f;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Java Programming Environments</h1>
+        <p>Demystifying JDK, JRE, Command Line, and IDEs</p>
+    </header>
+
+    <div class="container">
+
+        <section class="architecture-box">
+            <h2 class="arch-title">How Java Components Fit Together</h2>
+            
+            <div class="nested-box jdk-box">
+                <span class="badge badge-jdk">JDK (Java Development Kit)</span>
+                <p><strong>Purpose:</strong> For Writing & Developing Java Applications.</p>
+                <p style="font-size: 0.9rem; margin-bottom: 15px;">Contains: Compiler (javac), Debugger, Documentation tools + JRE</p>
+                
+                <div class="nested-box jre-box">
+                    <span class="badge badge-badge badge-jre">JRE (Java Runtime Environment)</span>
+                    <p><strong>Purpose:</strong> For Running Pre-compiled Java Applications.</p>
+                    <p style="font-size: 0.9rem; margin-bottom: 15px;">Contains: Class Libraries, Core Files + JVM</p>
+                    
+                    <div class="nested-box jvm-box">
+                        <span class="badge badge-jvm">JVM (Java Virtual Machine)</span>
+                        <p>Executes the raw bytecode on your specific operating system machine. It provides true platform independence.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="grid">
+            <div class="card">
+                <h2>JDK</h2>
+                <p style="color:#666; margin-bottom: 15px;">The Developer's Toolbox</p>
+                <ul>
+                    <li>Used by software developers to build applications.</li>
+                    <li>Contains development tools like <code>javac</code> (compiler).</li>
+                    <li>Crucial when working inside an <strong>IDE</strong> to write code.</li>
+                    <li>An absolute superset (Contains JRE + Tools).</li>
+                </ul>
+            </div>
+
+            <div class="card jre-card">
+                <h2>JRE</h2>
+                <p style="color:#666; margin-bottom: 15px;">The User's Execution Package</p>
+                <ul>
+                    <li>Used by end-users who just want to execute a Java app.</li>
+                    <li>Does not contain a compiler; cannot turn source code into running apps.</li>
+                    <li>Contains the vital core library classes required to read data.</li>
+                    <li>Sufficient for standalone computers running client software.</li>
+                </ul>
+            </div>
+        </div>
+
+        <section class="example-section">
+            <h2>Practical Example: Hello World</h2>
+            <p style="margin-bottom: 20px; color: #586069;">How your code interacts with these environments dynamically depending on your workflow choice:</p>
+
+            <pre><code><span class="keyword">public class</span> <span class="class-name">HelloWorld</span> {
+    <span class="keyword">public static void</span> <span class="class-name">main</span>(String[] args) {
+        System.out.println(<span class="string">"Hello, World!"</span>); <span class="comment">// Your Java App code</span>
+    }
+}</code></pre>
+
+            <div class="tabs">
+                <div class="tab active">Option A: Command Line Execution (Manual Workflow)</div>
+            </div>
+
+            <div>
+                <p>To run this code manually using purely the <strong>JDK Tools</strong> via Command Prompt / Terminal:</p>
+                <ol style="margin: 15px 0 15px 25px;">
+                    <li><strong>Compile Code (Requires JDK):</strong> Convert human-readable text into Java Bytecode (<code>.class</code> file).
+                        <pre style="margin-top:5px; background:#111;">$ javac HelloWorld.java</pre>
+                    </li>
+                    <li><strong>Run Code (Requires JRE/JVM):</strong> Launch the compiled file.
+                        <pre style="margin-top:5px; background:#111;">$ java HelloWorld</pre>
+                    </li>
+                </ol>
+            </div>
+
+            <div class="env-notes">
+                <strong>💡 Modern IDE Workflow Choice (Eclipse, IntelliJ, VS Code):</strong> 
+                An IDE combines text editing, automated <strong>JDK</strong> compilation, and <strong>JRE</strong> execution into a single "Run" button click. It completely manages the command line strings for you behind the scenes!
+            </div>
+        </section>
+
+    </div>
+
+</body>
+</html>
