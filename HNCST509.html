@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HNCST509: Object Oriented Design Using UML | Course Blog</title>
+    <style>
+        :root {
+            --primary-color: #1a365d;
+            --secondary-color: #2b6cb0;
+            --accent-color: #319795;
+            --text-dark: #2d3748;
+            --text-light: #718096;
+            --bg-light: #f7fafc;
+            --bg-white: #ffffff;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: var(--text-dark);
+            background-color: var(--bg-light);
+            line-height: 1.7;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: var(--bg-white);
+            padding: 40px 20px;
+            text-align: center;
+            border-bottom: 4px solid var(--secondary-color);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        header p {
+            color: #90cdf4;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 500;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            display: flex;
+            gap: 30px;
+        }
+
+        .main-content {
+            width: 70%;
+        }
+
+        .sidebar {
+            width: 30%;
+        }
+
+        .blog-post {
+            background-color: var(--bg-white);
+            padding: 35px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .post-meta {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .blog-post h2 {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+
+        .blog-post h3 {
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+            margin-top: 25px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .blog-post p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .blog-post ul, .blog-post ol {
+            margin-bottom: 15px;
+            padding-left: 20px;
+        }
+
+        .blog-post li {
+            margin-bottom: 8px;
+        }
+
+        .verbatim-block {
+            background-color: #f8fafc;
+            border-left: 4px solid var(--accent-color);
+            padding: 20px;
+            margin: 15px 0;
+            font-size: 0.95rem;
+            color: #334155;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .verbatim-block a {
+            color: #2b6cb0;
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 1px dashed #2b6cb0;
+        }
+
+        .verbatim-block a:hover {
+            color: #1a365d;
+            border-bottom-style: solid;
+            background-color: #ebf8ff;
+        }
+
+        .sidebar-widget {
+            background-color: var(--bg-white);
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .sidebar-widget h3 {
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .course-meta-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        .course-meta-table td {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .course-meta-table td:first-child {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .course-meta-table td:last-child {
+            color: var(--text-light);
+            text-align: right;
+        }
+
+        .grading-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        .grading-table th, .grading-table td {
+            border: 1px solid var(--border-color);
+            padding: 6px;
+            text-align: center;
+        }
+
+        .grading-table th {
+            background-color: var(--bg-light);
+            font-weight: 600;
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: var(--bg-white);
+            text-align: center;
+            padding: 25px 20px;
+            margin-top: 60px;
+            font-size: 0.9rem;
+            border-top: 4px solid var(--accent-color);
+        }
+
+        footer p {
+            color: #a0aec0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                padding: 0 15px;
+            }
+            .main-content, .sidebar {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>HNCST509: Object Oriented Design Using UML</h1>
+        <p>Interactive Course Blog & Learning Roadmap</p>
+    </header>
+
+    <div class="container">
+        
+        <div class="main-content">
+            
+            <article class="blog-post">
+                <div class="post-meta">Published in <span>Course Introduction</span></div>
+                <h2>Welcome to Object Oriented Design Using UML</h2>
+                <p>Welcome to the enhanced learning interface for <strong>HNCST509</strong>. This roadmap embeds official verbatim content from your curriculum directly alongside contextual reference links to maximize study productivity. Click on any dynamic topic highlighted inside the modules to immediately view curated learning references.</p>
+                
+                <h3>Course Objectives</h3>
+                <ul>
+                    <li>To master the fundamental principles of object-oriented methodology-including abstraction, encapsulation, and inheritance and apply analysis techniques to model the static and dynamic behavior of software systems[cite: 54].</li>
+                    <li>To implement rigorous system and object design strategies and utilize the Unified Modeling Language (UML) along with standard design patterns to construct robust, scalable software architectures[cite: 55].</li>
+                </ul>
+            </article>
+
+            <article class="blog-post">
+                <div class="post-meta">Lecture Series <span>Module 01</span> • 11 Contact Hours</div>
+                <h2>Module 1: Introduction & Object Modeling</h2>
+                <p>Click any element within the verbatim syllabus block to access targeted reference materials:</p>
+                
+                <div class="verbatim-block">
+                    Introduction: <a href="https://www.geeksforgeeks.org/object-oriented-analysis-and-design/" target="_blank">Object Oriented Development</a> - 
+                    <a href="https://www.geeksforgeeks.org/unified-modeling-language-uml-introduction/" target="_blank">Modeling Concepts</a> - 
+                    <a href="https://www.tutorialspoint.com/object_oriented_analysis_design/ooad_object_oriented_methodologies.htm" target="_blank">Object Oriented Methodology</a>[cite: 61]. 
+                    Object Oriented Themes - <a href="https://www.geeksforgeeks.org/abstraction-in-oops/" target="_blank">Abstraction</a> - 
+                    <a href="https://www.geeksforgeeks.org/encapsulation-in-oops/" target="_blank">Encapsulation</a> - 
+                    <a href="https://en.wikipedia.org/wiki/Object-oriented_programming#Features" target="_blank">Combining Data and Behavior</a> - 
+                    <a href="https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/Object_prototypes" target="_blank">Sharing</a> - 
+                    <a href="https://www.javatpoint.com/object-oriented-analysis" target="_blank">Emphasis on Object Structure</a>[cite: 62]. 
+                    <a href="https://www.tutorialspoint.com/object_oriented_analysis_design/ooad_object_oriented_models.htm" target="_blank">Object Oriented Models</a>[cite: 63].<br><br>
+                    
+                    Object modeling: <a href="https://www.geeksforgeeks.org/oops-object-and-class/" target="_blank">Objects and Classes</a>, 
+                    <a href="https://www.geeksforgeeks.org/association-in-java-example/" target="_blank">Links and Associations</a>, 
+                    <a href="https://www.uml-diagrams.org/association.html" target="_blank">Advanced links and Association Concepts</a>, 
+                    <a href="https://www.geeksforgeeks.org/inheritance-in-oops/" target="_blank">Generalization and Inheritance</a>, 
+                    <a href="https://www.uml-diagrams.org/package-diagrams.html" target="_blank">Grouping Constructs</a>, 
+                    <a href="https://www.geeksforgeeks.org/unified-modeling-language-uml-class-diagrams/" target="_blank">A Sample Object Model</a>[cite: 64].
+                </div>
+            </article>
+
+            <article class="blog-post">
+                <div class="post-meta">Lecture Series <span>Module 02</span> • 11 Contact Hours</div>
+                <h2>Module 2: Dynamic Modeling, Functional Modeling & Analysis</h2>
+                <p>Click any element within the verbatim syllabus block to access targeted reference materials:</p>
+                
+                <div class="verbatim-block">
+                    Dynamic modeling: <a href="https://www.uml-diagrams.org/state-machine-diagrams.html" target="_blank">Events and States</a>, 
+                    <a href="https://www.visual-paradigm.com/guide/uml/what-is-class-diagram/" target="_blank">Operations</a>, 
+                    <a href="https://www.geeksforgeeks.org/uml-state-chart-diagrams/" target="_blank">Nested state diagrams</a>, 
+                    <a href="https://www.uml-diagrams.org/state-machine-diagrams.html#concurrency" target="_blank">Concurrency</a>, 
+                    <a href="https://www.visual-paradigm.com/guide/uml/what-is-state-machine-diagram/" target="_blank">Advanced Dynamic Modeling Concepts</a>, 
+                    <a href="https://www.geeksforgeeks.org/uml-sequence-diagram/" target="_blank">A sample Dynamic Model</a>, 
+                    <a href="https://en.wikipedia.org/wiki/Object_Discovery" target="_blank">Relationship of Object and Dynamic models</a>[cite: 68].<br><br>
+                    
+                    Functional modeling: <a href="https://en.wikipedia.org/wiki/Functional_model" target="_blank">Functional models</a>, 
+                    <a href="https://www.geeksforgeeks.org/data-flow-diagram-dfd/" target="_blank">Data Flow Diagrams</a>, 
+                    <a href="https://www.visual-paradigm.com/guide/data-flow-diagram/what-is-dfd/" target="_blank">Specifying Operations</a>, 
+                    <a href="https://www.uml-diagrams.org/constraint.html" target="_blank">Constraints</a>, 
+                    <a href="https://www.w3schools.in/dbms/data-flow-diagrams" target="_blank">A sample Functional Model</a>[cite: 69].<br><br>
+                    
+                    Analysis: <a href="https://www.tutorialspoint.com/object_oriented_analysis_design/ooad_object_oriented_analysis.htm" target="_blank">Object Modeling</a> - 
+                    <a href="https://www.geeksforgeeks.org/identify-classes-and-objects-from-a-problem-statement/" target="_blank">Identifying Object Classes</a> - 
+                    <a href="https://www.geeksforgeeks.org/software-engineering-data-dictionary/" target="_blank">Preparing a Data Dictionary</a> - 
+                    <a href="https://www.uml-diagrams.org/class-diagram.html#association" target="_blank">Identifying Associations</a>[cite: 70]. 
+                    Dynamic Modeling - <a href="https://www.visual-paradigm.com/guide/uml/what-is-use-case-diagram/" target="_blank">Preparing a Scenario Interface Format</a> - 
+                    <a href="https://www.uml-diagrams.org/state-machine-diagrams-events.html" target="_blank">Identifying Event</a> - 
+                    <a href="https://www.geeksforgeeks.org/uml-behavioral-diagrams/" target="_blank">Building a State Diagram</a>[cite: 71]. 
+                    Functional Modeling - <a href="https://www.geeksforgeeks.org/data-flow-diagram-dfd/#levels-in-dfd" target="_blank">Identifying input and Output Values</a> - 
+                    <a href="https://www.visual-paradigm.com/guide/data-flow-diagram/how-to-draw-dfd/" target="_blank">Building Data Flow Diagram</a> - 
+                    <a href="https://www.tutorialspoint.com/software_engineering/software_analysis_design_tools.htm" target="_blank">Describing Functions</a>[cite: 72].
+                </div>
+            </article>
+
+            <article class="blog-post">
+                <div class="post-meta">Lecture Series <span>Module 03</span> • 11 Contact Hours</div>
+                <h2>Module 3: System Design & Object Design</h2>
+                <p>Click any element within the verbatim syllabus block to access targeted reference materials:</p>
+                
+                <div class="verbatim-block">
+                    System Design: <a href="https://www.geeksforgeeks.org/subsystem-in-software-engineering/" target="_blank">Breaking System into Subsystems</a>, 
+                    <a href="https://www.tutorialspoint.com/object_oriented_analysis_design/ooad_system_design.htm" target="_blank">Identifying Concurrency</a>, 
+                    <a href="https://en.wikipedia.org/wiki/Task_allocation_problem" target="_blank">Allocating Subsystems to Processors and Tasks</a>, 
+                    <a href="https://www.geeksforgeeks.org/architecture-design-in-software-engineering/" target="_blank">Managing Data Stores</a>, 
+                    <a href="https://en.wikipedia.org/wiki/Resource_management" target="_blank">Handling of Global Resources</a>, 
+                    <a href="https://www.geeksforgeeks.org/software-engineering-architectural-frameworks/" target="_blank">Common Architectural Framework</a>[cite: 76].<br><br>
+                    
+                    Object Design: <a href="https://www.tutorialspoint.com/object_oriented_analysis_design/ooad_object_design.htm" target="_blank">Overview of Object design</a>, 
+                    <a href="https://en.wikipedia.org/wiki/Object-oriented_analysis_and_design" target="_blank">Combining the three models</a>, 
+                    <a href="https://www.geeksforgeeks.org/design-and-analysis-of-algorithms/" target="_blank">Designing algorithms</a>, 
+                    <a href="https://en.wikipedia.org/wiki/Program_optimization" target="_blank">Design optimization</a>, 
+                    <a href="https://www.tutorialspoint.com/object_oriented_analysis_design/ooad_dynamic_modeling.htm" target="_blank">Implementation of control</a>, 
+                    <a href="https://www.geeksforgeeks.org/subclassing-vs-subtyping-vs-inheritance/" target="_blank">Adjustment of inheritance</a>, 
+                    <a href="https://www.uml-diagrams.org/class-diagram.html" target="_blank">Design of association</a>, 
+                    <a href="https://www.geeksforgeeks.org/object-oriented-programming-oops-concept-in-java/" target="_blank">Object representation</a>, 
+                    <a href="https://en.wikipedia.org/wiki/Modular_programming" target="_blank">Physical packaging</a>[cite: 77]. 
+                    <a href="https://en.wikipedia.org/wiki/Design_rationale" target="_blank">Documenting design decisions</a> - 
+                    <a href="https://www.geeksforgeeks.org/software-engineering-agile-vs-waterfall-vs-rad-vs-spiral-models/" target="_blank">Comparison of methodologies</a>[cite: 78].
+                </div>
+            </article>
+
+            <article class="blog-post">
+                <div class="post-meta">Lecture Series <span>Module 04</span> • 11 Contact Hours</div>
+                <h2>Module 4: Unified Modeling Language (UML) & Design Patterns</h2>
+                <p>Click any element within the verbatim syllabus block to access targeted reference materials:</p>
+                
+                <div class="verbatim-block">
+                    <a href="https://www.geeksforgeeks.org/unified-modeling-language-uml-introduction/" target="_blank">Unified Modeling Language (UML)</a> - 
+                    <a href="https://www.visual-paradigm.com/guide/uml/what-is-uml/" target="_blank">UML introduction & benefits</a> - 
+                    <a href="https://www.geeksforgeeks.org/unified-modeling-language-uml-structural-vs-behavioral-diagrams/" target="_blank">Different types of UML diagrams</a>[cite: 83]:<br><br>
+                    
+                    • <a href="https://www.geeksforgeeks.org/uml-behavioral-diagrams/" target="_blank">Behavioral Diagrams</a>: 
+                    <a href="https://www.geeksforgeeks.org/uml-activity-diagram/" target="_blank">Activity Diagram</a>, 
+                    <a href="https://www.geeksforgeeks.org/unified-modeling-language-uml-use-case-diagrams/" target="_blank">Use Case Diagram</a>, 
+                    <a href="https://www.geeksforgeeks.org/uml-state-chart-diagrams/" target="_blank">State Machine Diagram</a>, 
+                    <a href="https://www.geeksforgeeks.org/uml-sequence-diagram/" target="_blank">Sequence Diagram</a>[cite: 84].<br>
+                    
+                    • <a href="https://www.geeksforgeeks.org/unified-modeling-language-uml-structural-diagrams/" target="_blank">Structural Diagrams</a>: 
+                    <a href="https://www.geeksforgeeks.org/unified-modeling-language-uml-class-diagrams/" target="_blank">Class Diagram</a>, 
+                    <a href="https://www.uml-diagrams.org/object-diagram.html" target="_blank">Object Diagram</a>, 
+                    <a href="https://www.geeksforgeeks.org/uml-component-diagram/" target="_blank">Component Diagram</a>, 
+                    <a href="https://www.uml-diagrams.org/composite-structure-diagram.html" target="_blank">Composite Structure Diagram</a>, 
+                    <a href="https://www.geeksforgeeks.org/uml-deployment-diagram/" target="_blank">Deployment Diagram</a>, 
+                    <a href="https://www.uml-diagrams.org/package-diagrams.html" target="_blank">Package Diagram</a>[cite: 85].<br><br>
+                    
+                    <a href="https://en.wikipedia.org/wiki/List_of_Unified_Modeling_Language_tools" target="_blank">UML tools and their needs</a>[cite: 86].<br><br>
+                    
+                    <a href="https://www.geeksforgeeks.org/software-design-patterns/" target="_blank">Design Patterns</a> - 
+                    <a href="https://www.geeksforgeeks.org/creational-design-patterns/" target="_blank">Creational</a>, 
+                    <a href="https://www.geeksforgeeks.org/structural-design-patterns/" target="_blank">Structural</a>, and 
+                    <a href="https://www.geeksforgeeks.org/behavioral-design-patterns/" target="_blank">Behavioral</a>[cite: 87].
+                </div>
+            </article>
+
+            <article class="blog-post">
+                <div class="post-meta">Prescribed Literature <span>Resources</span></div>
+                <h2>Textbooks & References</h2>
+                
+                <h3>Core Textbooks</h3>
+                <ol>
+                    <li><strong>Object-Oriented Modeling and Design</strong>, James Rumbaugh, Michael Blaha, William Premerlani, Frederick Eddy, and William Lorensen, Prentice Hall India[cite: 90].</li>
+                    <li><strong>Object Oriented Analysis and Design with Applications</strong>, Grady Booch, 3rd Edition, Pearson Education Asia[cite: 91].</li>
+                </ol>
+
+                <h3>Reference Books</h3>
+                <ol>
+                    <li><strong>Object Oriented Software Engineering</strong>, Ivan Jacobson, 3rd Edition, Pearson Education Asia[cite: 93].</li>
+                    <li><strong>Object Oriented Software Engineering</strong>, Bernd Bruegge, Allen H. Dutoit, 3rd Edition, Pearson Education Asia[cite: 94].</li>
+                    <li><strong>Object Oriented Analysis and Design using UML</strong>, H. Srimathi, H. Sriram, A. Krishnamoorthy, 1st Edition, Scitech Publications[cite: 95].</li>
+                    <li><strong>UML and C++: A Practical Guide to Object-Oriented Development</strong>, Richard C. Lee, William M. Tepfenhart, 2nd Edition, Prentice Hall India[cite: 96].</li>
+                </ol>
+            </article>
+
+        </div>
+
+        <div class="sidebar">
+            
+            <div class="sidebar-widget">
+                <h3>Specification & Overview</h3>
+                <table class="course-meta-table">
+                    <tr>
+                        <td>Course Code</td>
+                        <td>HNCST509 [cite: 52]</td>
+                    </tr>
+                    <tr>
+                        <td>Course Name</td>
+                        <td>Object Oriented Design Using UML [cite: 52]</td>
+                    </tr>
+                    <tr>
+                        <td>Semester</td>
+                        <td>V (Semester 5) [cite: 52]</td>
+                    </tr>
+                    <tr>
+                        <td>Credits</td>
+                        <td>4 Credits [cite: 52]</td>
+                    </tr>
+                    <tr>
+                        <td>Structure (L:T:P)</td>
+                        <td>3:1:0 per week [cite: 52]</td>
+                    </tr>
+                    <tr>
+                        <td>Course Type</td>
+                        <td>Theory [cite: 52]</td>
+                    </tr>
+                    <tr>
+                        <td>Exam Duration</td>
+                        <td>2 Hours 30 Minutes [cite: 52]</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="sidebar-widget">
+                <h3>Course Assessment Method</h3>
+                <p><strong>Continuous Internal Evaluation (CIE): 40 Marks [cite: 52]</strong></p>
+                <table class="grading-table">
+                    <thead>
+                        <tr>
+                            <th>Attendance</th>
+                            <th>Exam-1 (Written)</th>
+                            <th>Exam-2 (Written)</th>
+                            <th>Assignment / Microproject</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>5 Marks [cite: 10]</td>
+                            <td>15 Marks [cite: 10]</td>
+                            <td>10 Marks [cite: 10]</td>
+                            <td>10 Marks [cite: 10]</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <p style="margin-top: 15px;"><strong>End Semester Examination (ESE): 60 Marks [cite: 52]</strong></p>
+                <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 10px;">The question paper consists of two parts. In Part A, all questions need to be answered[cite: 14]. In Part B, students can choose any one full question out of two provided options from each module[cite: 15].</p>
+                <table class="grading-table">
+                    <thead>
+                        <tr>
+                            <th>Part</th>
+                            <th>Structure & Rules</th>
+                            <th>Marks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>A</strong> [cite: 16]</td>
+                            <td>Contains 2 questions from each of the 4 modules. All 8 questions are compulsory[cite: 16].</td>
+                            <td>8 x 3 = 24 Marks [cite: 16]</td>
+                        </tr>
+                        <tr>
+                            <td><strong>B</strong> [cite: 16]</td>
+                            <td>Contains 2 questions from each module, out of which the student must answer 1 question. Each question can have a maximum of 3 sub-divisions[cite: 16].</td>
+                            <td>4 x 9 = 36 Marks [cite: 16]</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Department of Computer Science & Engineering. All Rights Reserved.</p>
+        <p style="margin-top: 5px; font-size: 0.8rem; color: #718096;">B.Tech Honours Degree Syllabus & Course Details Portal [cite: 50]</p>
+    </footer>
+
+</body>
+</html>
