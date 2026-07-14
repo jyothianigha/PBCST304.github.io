@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Java Strings — Immutable by Design</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6EFEA;
+    --paper-edge:#E4D6CC;
+    --ink:#241B17;
+    --ink-soft:#6B5A50;
+    --card:#FFFFFF;
+    --panel:#221512;
+    --panel-edge:#4A322B;
+    --wine:#9C3346;
+    --wine-soft:#F1DDE0;
+    --wine-deep:#6E1F2E;
+    --teal:#2E7D6B;
+    --teal-soft:#DCEEE8;
+    --gold:#C7912F;
+    --line:#E4D6CC;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    font-size:16.5px;
+    line-height:1.65;
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:0 24px;}
+
+  /* ===== HERO ===== */
+  header.hero{background:var(--panel);color:#f3ece7;padding:66px 0 0;}
+  .hero-inner{max-width:980px;margin:0 auto;padding:0 24px;}
+  .kicker{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--gold);display:flex;align-items:center;gap:10px;
+  }
+  .kicker::before{content:"";width:22px;height:1px;background:var(--gold);display:inline-block;}
+  h1.title{
+    font-family:'Bitter', serif;
+    font-weight:700;
+    font-size:clamp(2.6rem,7vw,4.3rem);
+    margin:14px 0 8px;
+    letter-spacing:-0.01em;
+  }
+  .hero-sub{font-size:1.1rem;color:#d9cac2;max-width:600px;margin:0 0 34px;}
+  nav.toc{display:flex;flex-wrap:wrap;gap:8px 6px;padding-bottom:34px;}
+  nav.toc a{
+    font-family:'JetBrains Mono', monospace;font-size:12.5px;
+    color:#e6dcd7;text-decoration:none;
+    border:1px solid var(--panel-edge);padding:6px 12px;border-radius:20px;transition:.2s;
+  }
+  nav.toc a:hover{border-color:var(--gold);color:var(--gold);}
+
+  /* signature: sealed strand */
+  .strand{display:flex;gap:3px;overflow-x:auto;padding-bottom:4px;}
+  .bead{
+    flex:0 0 44px;height:44px;
+    background:#150c0a;border:1px solid var(--panel-edge);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'JetBrains Mono', monospace;font-size:17px;font-weight:600;
+    color:#f3ece7;border-radius:3px;
+  }
+  .strand-cap{
+    font-family:'JetBrains Mono', monospace;font-size:11.5px;color:#c9b8ae;
+    padding:10px 0 32px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;
+  }
+  .strand-cap b{color:var(--gold);}
+  .seal{
+    display:inline-flex;align-items:center;gap:6px;
+    font-family:'JetBrains Mono', monospace;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--wine-deep);background:var(--wine-soft);border:1px solid var(--wine);
+    padding:3px 9px;border-radius:20px;
+  }
+
+  main{padding:50px 0 20px;}
+  section.topic{margin-bottom:56px;scroll-margin-top:20px;}
+  .topic-head{display:flex;align-items:baseline;gap:14px;margin-bottom:6px;}
+  .num{
+    font-family:'JetBrains Mono', monospace;font-size:13px;
+    background:#150c0a;color:var(--gold);padding:3px 9px;border-radius:3px;
+  }
+  h2{font-family:'Bitter', serif;font-weight:700;font-size:1.7rem;margin:0;}
+  .topic-dek{color:var(--ink-soft);max-width:660px;margin:10px 0 22px;}
+  h3{font-family:'Bitter', serif;font-weight:600;font-size:1.1rem;margin:26px 0 10px;color:var(--ink);}
+  p{margin:0 0 15px;}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:24px 26px;margin:18px 0;}
+
+  pre{
+    background:var(--panel);color:#f0e6e1;padding:18px 20px;border-radius:8px;
+    overflow-x:auto;font-family:'JetBrains Mono', monospace;font-size:13.5px;line-height:1.6;
+    border:1px solid var(--panel-edge);margin:14px 0;
+  }
+  pre .c{color:#8a746a;}
+  pre .kw{color:var(--gold);}
+  pre .ty{color:#e2a0ac;}
+  pre .st{color:#9fd0c3;}
+
+  code.inline{
+    font-family:'JetBrains Mono', monospace;background:#ecdfd8;color:#3a2620;
+    padding:2px 6px;border-radius:4px;font-size:.9em;
+  }
+
+  ul.clean{padding-left:1.2em;margin:0 0 14px;}
+  ul.clean li{margin-bottom:7px;}
+
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  @media(max-width:700px){.grid-2{grid-template-columns:1fr;} .hero-sub{max-width:100%;}}
+
+  .callout{border-left:3px solid var(--wine);background:var(--wine-soft);padding:14px 18px;margin:18px 0;border-radius:0 6px 6px 0;}
+  .callout.mutable{border-left-color:var(--teal);background:var(--teal-soft);}
+  .callout .tag{
+    font-family:'JetBrains Mono', monospace;font-size:11px;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--wine-deep);display:block;margin-bottom:6px;font-weight:700;
+  }
+  .callout.mutable .tag{color:var(--teal);}
+
+  table.ref{width:100%;border-collapse:collapse;margin:16px 0;font-size:.94rem;}
+  table.ref th,table.ref td{border:1px solid var(--line);padding:10px 13px;text-align:left;vertical-align:top;}
+  table.ref th{background:var(--panel);color:var(--gold);font-family:'JetBrains Mono', monospace;font-weight:500;font-size:12px;letter-spacing:.03em;}
+  table.ref tr:nth-child(even) td{background:#faf5f1;}
+
+  /* pool diagram */
+  .pool-diagram{display:flex;gap:36px;flex-wrap:wrap;align-items:flex-start;margin:16px 0 6px;}
+  .pool-col{flex:1;min-width:230px;}
+  .pool-col h4{
+    font-family:'JetBrains Mono', monospace;font-size:11px;text-transform:uppercase;letter-spacing:.06em;
+    color:var(--ink-soft);margin:0 0 10px;
+  }
+  .ref-box{
+    font-family:'JetBrains Mono', monospace;font-size:12.5px;background:var(--card);
+    border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin-bottom:8px;
+  }
+  .pool-obj{
+    font-family:'JetBrains Mono', monospace;font-size:13px;background:#150c0a;color:#f3ece7;
+    border:1px solid var(--panel-edge);border-radius:6px;padding:12px 14px;text-align:center;
+  }
+  .pool-obj.shared{border-color:var(--gold);}
+  .arrow-note{font-family:'JetBrains Mono', monospace;font-size:11px;color:var(--ink-soft);margin-top:8px;}
+
+  footer{
+    margin-top:60px;padding:30px 0 60px;border-top:1px solid var(--line);
+    font-family:'JetBrains Mono', monospace;font-size:12px;color:var(--ink-soft);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    
+    <h1 class="title">Strings</h1>
+   
+  </div>
+
+ 
+</header>
+
+<main class="wrap">
+
+  <!-- 1 -->
+  <section class="topic" id="what">
+    <div class="topic-head"><span class="num">01</span><h2>What is a String?</h2></div>
+    <p class="topic-dek"></p>
+    <div class="card">
+      <ul class="clean">
+        <li><strong>A</strong> <code class="inline">String</code> is a class in <code class="inline">java.lang</code>, even though Java lets you create one with literal syntax like a primitive.</li>
+        <li><strong>Immutable.</strong> Once built, its characters never change.<code class="inline"></code>, <code class="inline"></code>, <code class="inline">+</code> — </li>
+        <li><strong>Backed by a char sequence.</strong> Internally a String wraps an array of characters, which is exactly why it's fixed-length once created.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section class="topic" id="creating">
+    <div class="topic-head"><span class="num">02</span><h2>Creating Strings</h2></div>
+    <p class="topic-dek">There are two ways to create a String, and they behave differently under the hood — which matters the moment you start comparing them.</p>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3 style="margin-top:0;">String literal</h3>
+        <pre><code><span class="ty">String</span> a = <span class="st">"hello"</span>;</code></pre>
+        <p style="margin-bottom:0;">Checked against a special pool of Strings first. If <code class="inline">"hello"</code> already exists there, the reference is reused — no new object is created.</p>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">The <code class="inline">new</code> keyword</h3>
+        <pre><code><span class="ty">String</span> b = <span class="kw">new</span> <span class="ty">String</span>(<span class="st">"hello"</span>);</code></pre>
+        <p style="margin-bottom:0;">Always creates a fresh object on the heap and memory area</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section class="topic" id="immutability">
+    <div class="topic-head"><span class="num">03</span><h2>Immutability &amp; the String Pool</h2></div>
+    <p class="topic-dek">Because Strings can't change, Java is free to let identical literals safely share one copy. That shared cache is the String Pool.</p>
+
+    <div class="pool-diagram">
+      <div class="pool-col">
+        <h4>Two literals</h4>
+        <div class="ref-box">String x = "cat";</div>
+        <div class="ref-box">String y = "cat";</div>
+        <div class="pool-obj shared">x and y points to same memory area<br><span style="color:var(--gold);"></span></div>
+        <div class="arrow-note">x == y &nbsp;→&nbsp; true</div>
+      </div>
+      <div class="pool-col">
+        <h4>One literal, one <code class="inline">new</code></h4>
+        <div class="ref-box">String p = "cat";</div>
+        <div class="ref-box">String q = new String("cat");</div>
+        <div class="pool-obj shared" style="margin-bottom:8px;">p and q points to different memory area<br><span style="color:var(--gold);"></span></div>
+       
+        <div class="arrow-note">p == q &nbsp;→&nbsp; false</div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="tag">Why concatenation "changing" a String is an illusion</span>
+      <pre style="margin:8px 0 0;"><code><span class="ty">String</span> greeting = <span class="st">"Hi"</span>;
+greeting = greeting + <span class="st">" there"</span>;  <span class="c">// "Hi" is untouched — a brand-new</span>
+                                 <span class="c">// String "Hi there" is created,</span>
+                                 <span class="c">// and greeting is re-pointed to it</span></code></pre>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section class="topic" id="comparing">
+    <div class="topic-head"><span class="num">04</span><h2>Comparing Strings</h2></div>
+    <p class="topic-dek">This is the single most common source of String bugs: <code class="inline">==</code> and <code class="inline">.equals()</code> ask two different questions.</p>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3 style="margin-top:0;"><code class="inline">==</code> — same object?</h3>
+        <pre><code><span class="ty">String</span> a = <span class="kw">new</span> <span class="ty">String</span>(<span class="st">"cat"</span>);
+<span class="ty">String</span> b = <span class="kw">new</span> <span class="ty">String</span>(<span class="st">"cat"</span>);
+a == b;   <span class="c">// false — two different objects</span></code></pre>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;"><code class="inline">.equals()</code> — same characters?</h3>
+        <pre><code><span class="ty">String</span> a = <span class="kw">new</span> <span class="ty">String</span>(<span class="st">"cat"</span>);
+<span class="ty">String</span> b = <span class="kw">new</span> <span class="ty">String</span>(<span class="st">"cat"</span>);
+a.equals(b);   <span class="c">// true — same character content</span></code></pre>
+      </div>
+    </div>
+    <div class="callout">
+      <span class="tag">Rule of thumb</span>
+      Always compare String content with <code class="inline">.equals()</code>. Reserve <code class="inline">==</code> for checking whether two references point to the exact same object — rarely what you actually want with Strings.
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section class="topic" id="methods">
+    <div class="topic-head"><span class="num">05</span><h2>Common Methods</h2></div>
+    <p class="topic-dek">A handful of methods cover the vast majority of everyday String work — every one of them returns something new rather than editing in place.</p>
+
+    <table class="ref">
+      <tr><th>Method</th><th>What it does</th><th>Example</th></tr>
+      <tr><td><code class="inline">length()</code></td><td>Number of characters</td><td><code class="inline">"hello".length() → 5</code></td></tr>
+      <tr><td><code class="inline">charAt(i)</code></td><td>Character at index <code class="inline">i</code></td><td><code class="inline">"hello".charAt(1) → 'e'</code></td></tr>
+      <tr><td><code class="inline">substring(a, b)</code></td><td>Characters from index a up to, not including, b</td><td><code class="inline">"hello".substring(1,4) → "ell"</code></td></tr>
+      <tr><td><code class="inline">indexOf(s)</code></td><td>First position of <code class="inline">s</code>, or -1 if absent</td><td><code class="inline">"hello".indexOf("l") → 2</code></td></tr>
+      <tr><td><code class="inline">toUpperCase()</code> / <code class="inline">toLowerCase()</code></td><td>New String with case changed</td><td><code class="inline">"Hi".toUpperCase() → "HI"</code></td></tr>
+      <tr><td><code class="inline">trim()</code> / <code class="inline">strip()</code></td><td>New String with leading/trailing whitespace removed</td><td><code class="inline">"  hi ".trim() → "hi"</code></td></tr>
+      <tr><td><code class="inline">replace(a, b)</code></td><td>New String with all occurrences of a replaced by b</td><td><code class="inline">"cat".replace('c','b') → "bat"</code></td></tr>
+      <tr><td><code class="inline">split(regex)</code></td><td>Breaks the String into an array by a delimiter</td><td><code class="inline">"a,b,c".split(",") → [a, b, c]</code></td></tr>
+      <tr><td><code class="inline">contains(s)</code></td><td>True if <code class="inline">s</code> appears anywhere inside</td><td><code class="inline">"hello".contains("ell") → true</code></td></tr>
+    </table>
+  </section>
+
+  <!-- 6 -->
+  
+
+
+
+
+
+  
+
+</main>
+
+<footer class="wrap">
+  <span>Java Fundamentals · Strings</span>
+  <span>immutable · pooled · heap-allocated</span>
+</footer>
+
+</body>
+</html>

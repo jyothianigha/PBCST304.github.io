@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Java Arrays — A Memory-First Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EEF2F0;
+    --paper-edge:#D7E0DA;
+    --ink:#141A17;
+    --ink-soft:#4B5A53;
+    --card:#FFFFFF;
+    --panel:#101512;
+    --panel-edge:#26332C;
+    --green:#63E29E;
+    --green-dim:#3C8F66;
+    --amber:#F2B84B;
+    --red:#EF6B5B;
+    --line:#D7E0DA;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    font-size:16.5px;
+    line-height:1.65;
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:0 24px;}
+
+  /* ===== HERO ===== */
+  header.hero{
+    background:var(--panel);
+    color:#eef2f0;
+    padding:70px 0 0;
+    overflow:hidden;
+  }
+  .hero-inner{max-width:980px;margin:0 auto;padding:0 24px;}
+  .kicker{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--green);
+    display:flex;align-items:center;gap:10px;
+  }
+  .kicker::before{content:"";width:22px;height:1px;background:var(--green);display:inline-block;}
+  h1.title{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:clamp(2.6rem,7vw,4.4rem);
+    margin:14px 0 8px;
+    letter-spacing:-0.01em;
+  }
+  .hero-sub{
+    font-size:1.1rem;
+    color:#b9c6bf;
+    max-width:600px;
+    margin:0 0 36px;
+  }
+  nav.toc{
+    display:flex;flex-wrap:wrap;gap:8px 6px;
+    padding-bottom:36px;
+  }
+  nav.toc a{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    color:#cfd9d3;
+    text-decoration:none;
+    border:1px solid var(--panel-edge);
+    padding:6px 12px;
+    border-radius:20px;
+    transition:.2s;
+  }
+  nav.toc a:hover{border-color:var(--green);color:var(--green);}
+
+  /* memory strip — the signature element */
+  .mem-strip{
+    display:flex;
+    gap:3px;
+    padding:0 0 4px;
+    overflow-x:auto;
+  }
+  .mem-cell{
+    flex:1 0 84px;
+    background:#0b100d;
+    border:1px solid var(--panel-edge);
+    border-top:2px solid var(--green-dim);
+    padding:12px 8px 10px;
+    text-align:center;
+    position:relative;
+  }
+  .mem-cell.active{border-top-color:var(--green);box-shadow:0 0 0 1px var(--green) inset;}
+  .mem-cell.error{border-top-color:var(--red);}
+  .mem-cell .addr{
+    font-family:'JetBrains Mono', monospace;
+    font-size:9.5px;
+    color:#5a6a60;
+    letter-spacing:.03em;
+  }
+  .mem-cell .val{
+    font-family:'JetBrains Mono', monospace;
+    font-size:19px;
+    font-weight:600;
+    color:#eef2f0;
+    margin:8px 0 6px;
+  }
+  .mem-cell.error .val{color:var(--red);font-size:14px;}
+  .mem-cell .idx{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:var(--amber);
+  }
+  .mem-strip-cap{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    color:#7d8d84;
+    padding:10px 0 34px;
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;
+  }
+  .mem-strip-cap b{color:var(--green);}
+
+  /* ===== MAIN ===== */
+  main{padding:52px 0 20px;}
+  section.topic{margin-bottom:56px;scroll-margin-top:20px;}
+  .topic-head{display:flex;align-items:baseline;gap:14px;margin-bottom:6px;}
+  .num{
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px;
+    color:var(--green-dim);
+    background:#0b100d;
+    color:var(--green);
+    padding:3px 9px;
+    border-radius:3px;
+  }
+  h2{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:1.7rem;
+    margin:0;
+  }
+  .topic-dek{color:var(--ink-soft);max-width:660px;margin:10px 0 22px;}
+  h3{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:1.12rem;
+    margin:28px 0 10px;
+    color:var(--ink);
+  }
+  p{margin:0 0 15px;}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:24px 26px;
+    margin:18px 0;
+  }
+
+  pre{
+    background:var(--panel);
+    color:#e7f0ea;
+    padding:18px 20px;
+    border-radius:8px;
+    overflow-x:auto;
+    font-family:'JetBrains Mono', monospace;
+    font-size:13.5px;
+    line-height:1.6;
+    border:1px solid var(--panel-edge);
+    margin:14px 0;
+  }
+  pre .c{color:#6b7f75;} /* comment */
+  pre .kw{color:var(--green);} /* keyword */
+  pre .ty{color:var(--amber);} /* type */
+  pre .st{color:#8fc7ff;} /* string/number literal-ish */
+
+  code.inline{
+    font-family:'JetBrains Mono', monospace;
+    background:#e4ebe6;
+    color:#1f3329;
+    padding:2px 6px;
+    border-radius:4px;
+    font-size:.9em;
+  }
+
+  ul.clean{padding-left:1.2em;margin:0 0 14px;}
+  ul.clean li{margin-bottom:7px;}
+
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  @media(max-width:700px){.grid-2{grid-template-columns:1fr;} .hero-sub{max-width:100%;}}
+
+  .callout{
+    border-left:3px solid var(--green-dim);
+    background:#e4f2ea;
+    padding:14px 18px;
+    margin:18px 0;
+    border-radius:0 6px 6px 0;
+  }
+  .callout.warn{border-left-color:var(--red);background:#fbeae7;}
+  .callout .tag{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--green-dim);
+    display:block;margin-bottom:6px;
+    font-weight:700;
+  }
+  .callout.warn .tag{color:var(--red);}
+
+  table.ref{width:100%;border-collapse:collapse;margin:16px 0;font-size:.94rem;}
+  table.ref th,table.ref td{border:1px solid var(--line);padding:10px 13px;text-align:left;vertical-align:top;}
+  table.ref th{background:var(--panel);color:var(--green);font-family:'JetBrains Mono', monospace;font-weight:500;font-size:12px;letter-spacing:.03em;}
+  table.ref td code.inline{font-size:.85em;}
+  table.ref tr:nth-child(even) td{background:#f4f7f5;}
+
+  /* 2D grid visual */
+  .grid2d{display:inline-grid;grid-template-columns:repeat(4,52px);gap:3px;margin:14px 0;}
+  .grid2d .cell{
+    background:#0b100d;border:1px solid var(--panel-edge);border-top:2px solid var(--green-dim);
+    color:#eef2f0;font-family:'JetBrains Mono', monospace;font-size:13px;
+    text-align:center;padding:10px 0;
+  }
+
+  footer{
+    margin-top:60px;
+    padding:30px 0 60px;
+    border-top:1px solid var(--line);
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="kicker">Java Fundamentals</div>
+    <h1 class="title">Arrays.</h1>
+    <p class="hero-sub"></p>
+
+  </div>
+
+  
+</header>
+
+<main class="wrap">
+
+  <!-- 1 -->
+  <section class="topic" id="what">
+    <div class="topic-head"><span class="num">01</span><h2>What is an Array?</h2></div>
+    <p class="topic-dek">An array is a fixed-size, ordered block of values of the same type, stored one after another in memory and reached by position rather than by name.</p>
+
+    
+  </section>
+
+  <!-- 2 -->
+  <section class="topic" id="declare">
+    <div class="topic-head"><span class="num">02</span><h2>Declaring &amp; Creating Arrays</h2></div>
+    <p class="topic-dek">Declaring an array just creates a reference. The array itself doesn't exist in memory until you create it with <code class="inline">new</code> or an initializer.</p>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3 style="margin-top:0;">Declare, then create</h3>
+        <pre><code><span class="ty">int</span>[] scores; or  int scores[];                 <span class="c">// reference only, no array yet</span>
+scores = <span class="kw">new</span> <span class="ty">int</span>[5];        <span class="c">// now: 5 slots, all default to 0</span></code></pre>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">Declare and initialize together</h3>
+        <pre><code><span class="ty">int</span>[] scores = { <span class="st">90</span>, <span class="st">85</span>, <span class="st">77</span>, <span class="st">100</span>, <span class="st">62</span> };
+<span class="ty">String</span>[] names  = <span class="kw">new</span> <span class="ty">String</span>[]{ <span class="st">"Rina"</span>, <span class="st">"Sam"</span> };</code></pre>
+      </div>
+    </div>
+
+    
+  </section>
+
+  <!-- 3 -->
+  
+  <!-- 4 -->
+  <section class="topic" id="iterate">
+    <div class="topic-head"><span class="num">04</span><h2>Iterating an Array</h2></div>
+    <p class="topic-dek">Two everyday patterns cover almost every case: the counted loop, when you need the index, and the enhanced for-loop, when you only need the values.</p>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3 style="margin-top:0;">Classic <code class="inline">for</code> — index available</h3>
+        <pre><code><span class="kw">for</span> (<span class="ty">int</span> i = <span class="st">0</span>; i &lt; scores.length; i++) {
+    System.out.println(<span class="st">"index "</span> + i + <span class="st">" = "</span> + scores[i]);
+}</code></pre>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">Enhanced <code class="inline">for</code> — values only</h3>
+        <pre><code><span class="kw">for</span> (<span class="ty">int</span> score : scores) {
+    System.out.println(score);
+}</code></pre>
+      </div>
+    </div>
+    <div class="callout">
+      <span class="tag">Rule of thumb</span>
+      Reach for the enhanced for-loop by default — it's shorter and can't go out of bounds. Fall back to the counted loop only when you actually need the index, or when you need to modify elements in place.
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section class="topic" id="2d">
+    <div class="topic-head"><span class="num">05</span><h2>Multi-Dimensional Arrays</h2></div>
+    <p class="topic-dek">Java doesn't have true multi-dimensional arrays — a 2D array is simply an array of arrays. Each row is its own independent array object.</p>
+
+    <div class="card">
+      <pre><code><span class="ty">int</span>[][] grid = {
+    { <span class="st">1</span>, <span class="st">2</span>, <span class="st">3</span> },
+    { <span class="st">4</span>, <span class="st">5</span>, <span class="st">6</span> }
+};
+
+grid[<span class="st">1</span>][<span class="st">2</span>];   <span class="c">// 6 — row 1, column 2</span>
+grid.length;      <span class="c">// 2  — number of rows</span>
+grid[0].length;   <span class="c">// 3  — length of row 0</span></code></pre>
+
+      <div class="grid2d">
+        <div class="cell">1</div><div class="cell">2</div><div class="cell">3</div><div class="cell" style="opacity:.25;">·</div>
+        <div class="cell">4</div><div class="cell">5</div><div class="cell" style="border-top-color:var(--green);">6</div><div class="cell" style="opacity:.25;">·</div>
+      </div>
+      <p style="margin-bottom:0;color:var(--ink-soft);font-size:.92rem;"><code class="inline">grid[1][2]</code> highlighted — row 1, column 2.</p>
+    </div>
+
+    <div class="callout">
+      <span class="tag">Because rows are independent arrays</span>
+      Rows in a 2D array don't have to be the same length — this is often called a <em>jagged array</em>. <code class="inline">int[][] jagged = { {1}, {1,2,3}, {1,2} };</code> is completely valid.
+    </div>
+  </section>
+
+  <!-- 6 -->
+  
+</main>
+
+<footer class="wrap">
+  <span>Java Fundamentals · Arrays</span>
+  <span>fixed-size · zero-indexed · contiguous</span>
+</footer>
+
+</body>
+</html>
