@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Java Control Statements — Field Notes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* page (light) palette */
+    --page-bg: #ffffff;
+    --surface: #f5f6fb;
+    --surface-2: #ecedf7;
+    --border: #e2e4f0;
+    --ink: #171922;
+    --ink-dim: #676b83;
+    --brand: #2f5fd6;
+    --amber: #b4700f;
+    --keyword: #d9531e;
+    --green: #2f8a4f;
+    --red: #d64b65;
+    --line-num: #c9cbdc;
+
+    /* code editor (dark) palette */
+    --ed-bg: #1d1f2b;
+    --ed-bg-2: #232538;
+    --ed-border: #2c2e42;
+    --ed-text: #c7cbe0;
+    --ed-text-dim: #7a7e9c;
+    --ed-linenum: #3b3e58;
+    --syn-keyword: #ff9e64;
+    --syn-string: #9ece6a;
+    --syn-number: #ff9ecd;
+    --syn-func: #7dcfff;
+    --syn-type: #bb9af7;
+    --syn-comment: #7a7fa0;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background: var(--page-bg);
+    color: var(--ink);
+    font-family: 'Sora', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  code, .mono{ font-family:'JetBrains Mono', monospace; }
+
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 42px 42px;
+    opacity:0.6;
+    pointer-events:none;
+    z-index:0;
+  }
+
+  .wrap{ position:relative; z-index:1; max-width:980px; margin:0 auto; padding: 0 24px 100px; }
+
+  /* HERO */
+  header.hero{ padding: 72px 0 40px; border-bottom: 1px solid var(--border); }
+  .eyebrow{
+    display:flex; align-items:center; gap:10px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px; color: var(--brand);
+    letter-spacing: 0.04em;
+    margin-bottom:22px;
+  }
+  .dot-row{ display:flex; gap:6px; }
+  .dot{ width:10px; height:10px; border-radius:50%; }
+  .dot.red{ background:#f7768e;} .dot.amber{ background:#e0af68;} .dot.green{ background:#9ece6a;}
+
+  h1.title{
+    font-size: clamp(2.4rem, 5vw, 3.6rem);
+    line-height:1.05; margin:0 0 18px; font-weight:700; color: var(--ink);
+  }
+  h1.title .brace{ color: var(--keyword); }
+  h1.title .accent{ color: var(--brand); }
+
+  p.lede{ font-size:1.08rem; line-height:1.65; color: var(--ink-dim); max-width: 660px; margin:0 0 28px; }
+
+  nav.jumplinks{ display:flex; flex-wrap:wrap; gap:10px; }
+  nav.jumplinks a{
+    font-family:'JetBrains Mono', monospace; font-size:12.5px; color: var(--ink-dim);
+    text-decoration:none; padding:7px 12px; border:1px solid var(--border);
+    border-radius:6px; background: var(--surface); transition: all .15s ease;
+  }
+  nav.jumplinks a:hover{ color: var(--ink); border-color: var(--brand); }
+
+  /* PART DIVIDER */
+  .part-divider{
+    display:flex; align-items:center; gap:16px;
+    margin: 56px 0 6px;
+  }
+  .part-divider .part-num{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px; font-weight:700; color:#ffffff;
+    background: var(--ink);
+    padding:5px 10px; border-radius:5px; letter-spacing:.04em;
+  }
+  .part-divider h2{ font-size:1.7rem; margin:0; color:var(--ink); font-weight:700; }
+  .part-divider .part-line{ flex:1; height:1px; background: var(--border); }
+  p.part-desc{ color:var(--ink-dim); line-height:1.65; max-width:700px; margin: 4px 0 0; }
+
+  /* SECTIONS */
+  section.op-group{ padding: 36px 0; border-bottom: 1px solid var(--border); }
+  .group-head{ display:flex; align-items:baseline; gap:14px; margin-bottom: 16px; }
+  .group-index{ font-family:'JetBrains Mono', monospace; color: var(--line-num); font-size: 1.4rem; font-weight:700; }
+  h3.group-title{ font-size:1.28rem; margin:0; color: var(--ink); font-weight:700; }
+  p.group-desc{ color:var(--ink-dim); line-height:1.6; margin: 0 0 18px; max-width: 700px; }
+
+  /* FLOW visual (selection) */
+  .flow{
+    margin-top:6px; margin-bottom:22px;
+    background: var(--surface); border:1px solid var(--border);
+    border-radius:10px; padding:20px;
+    display:flex; flex-wrap:wrap; align-items:center; gap:10px;
+    font-family:'JetBrains Mono', monospace; font-size:13px;
+  }
+  .flow .node{
+    padding:9px 14px; border-radius:7px; background:#fff;
+    border:1px solid var(--border); color:var(--ink);
+  }
+  .flow .node.cond{ border-color: rgba(47,95,214,0.4); color: var(--brand); }
+  .flow .node.yes{ border-color: rgba(47,138,79,0.5); color: var(--green); }
+  .flow .node.no{ border-color: rgba(214,75,101,0.5); color: var(--red); }
+  .flow .arrow{ color: var(--ink-dim); }
+
+  /* loop visual */
+  .loop-viz{
+    margin-top:6px; margin-bottom:22px;
+    background: var(--surface); border:1px solid var(--border);
+    border-radius:10px; padding:20px;
+  }
+  .loop-viz .row{ display:flex; align-items:center; gap:8px; margin-bottom:10px; flex-wrap:wrap; }
+  .loop-viz .row:last-child{ margin-bottom:0; }
+  .loop-viz .tag{
+    font-family:'JetBrains Mono', monospace; font-size:12px;
+    padding:6px 10px; border-radius:6px; background:#fff; border:1px solid var(--border); color: var(--ink-dim);
+  }
+  .loop-viz .tag.hit{ background: var(--brand); color:#fff; border-color: var(--brand); font-weight:600; }
+  .loop-viz .tag.skip{ background: transparent; color: var(--red); border-style:dashed; text-decoration:line-through; }
+  .loop-viz .tag.stop{ background: var(--red); color:#fff; border-color: var(--red); font-weight:600; }
+  .loop-viz .caption{ font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--ink-dim); margin-top:6px; }
+
+  /* CODE PANEL */
+  .editor{
+    margin-top:18px; border-radius:10px; overflow:hidden;
+    border:1px solid var(--ed-border); background: var(--ed-bg); color: var(--ed-text);
+    box-shadow: 0 24px 44px -22px rgba(23,25,34,0.35);
+  }
+  .editor-bar{
+    display:flex; align-items:center; justify-content:space-between; padding:10px 16px;
+    background: var(--ed-bg-2); border-bottom:1px solid var(--ed-border);
+  }
+  .editor-bar .fname{ font-family:'JetBrains Mono', monospace; font-size:12.5px; color: var(--ed-text-dim); }
+  .editor-body{
+    display:grid; grid-template-columns: 34px 1fr;
+    font-family:'JetBrains Mono', monospace; font-size:13.5px; line-height:1.75;
+    padding: 16px 0; overflow-x:auto;
+  }
+  .gutter{ text-align:right; padding-right:14px; color: var(--ed-linenum); user-select:none; border-right:1px solid var(--ed-border); }
+  .code-lines{ padding-left:16px; white-space:pre; color: var(--ed-text); }
+  .kw{ color: var(--syn-keyword); }
+  .str{ color: var(--syn-string); }
+  .num{ color: var(--syn-number); }
+  .fn{ color: var(--syn-func); }
+  .ty{ color: var(--syn-type); }
+  .cm{ color: var(--syn-comment); font-style:italic; }
+
+  .console{
+    border-top:1px solid var(--ed-border); background:#131420; padding:14px 20px;
+    font-family:'JetBrains Mono', monospace; font-size:13px;
+  }
+  .console .prompt{ color:#9ece6a; }
+  .console .out{ color:#e0e0f0; }
+  .console .label{ color: var(--ed-text-dim); font-size:11px; text-transform:uppercase; letter-spacing:.05em; margin-bottom:8px; display:block; }
+
+  .note{
+    margin-top:16px; padding:12px 16px; background: rgba(180,112,15,0.08);
+    border-left:3px solid var(--amber); border-radius: 0 6px 6px 0;
+    font-size:13.5px; color: var(--ink); line-height:1.6;
+  }
+  .note b{ color: var(--amber); }
+
+  /* mini comparison table */
+  table.cmp{
+    width:100%; border-collapse:collapse; margin-top:20px;
+    font-family:'JetBrains Mono', monospace; font-size:13px;
+    background: var(--surface); border:1px solid var(--border); border-radius:10px; overflow:hidden;
+  }
+  table.cmp th{
+    text-align:left; background: var(--surface-2); color: var(--amber); font-weight:600;
+    padding:10px 14px; border-bottom:1px solid var(--border); font-size:11.5px;
+    letter-spacing:.03em; text-transform:uppercase;
+  }
+  table.cmp td{ padding:9px 14px; border-bottom:1px solid var(--border); color: var(--ink); }
+  table.cmp tr:last-child td{ border-bottom:none; }
+  table.cmp td.opsym{ color: var(--brand); font-weight:600; }
+
+  footer{ padding:40px 0 0; text-align:center; color: var(--ink-dim); font-family:'JetBrains Mono', monospace; font-size:12.5px; }
+
+  @media (max-width:640px){
+    .editor-body{ grid-template-columns: 28px 1fr; font-size:12px; }
+    table.cmp{ font-size:11.5px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">
+      <span class="dot-row"><span class="dot red"></span><span class="dot amber"></span><span class="dot green"></span></span>
+      ControlFlow.java
+    </div>
+    <h1 class="title"><span class="brace"></span> Java Control Statements <span class="accent"></span> <span class="brace"></span></h1>
+    <p class="lede">Every Java program is a sequence of statements — but selection, iteration, and jump statements are what let it branch, repeat, and change direction. Here's how each one behaves, with runnable examples.</p>
+    <nav class="jumplinks">
+      <a href="#if">if</a>
+      <a href="#ifelse">if-else</a>
+      <a href="#elseif">else-if ladder</a>
+      <a href="#switch">switch</a>
+      <a href="#for">for</a>
+      <a href="#while">while</a>
+      <a href="#dowhile">do-while</a>
+      <a href="#foreach">for-each</a>
+      <a href="#break">break</a>
+      <a href="#continue">continue</a>
+      <a href="#return">return</a>
+    </nav>
+  </header>
+
+  <!-- ============ PART 1: SELECTION ============ -->
+  <div class="part-divider">
+    <span class="part-num">PART 01</span>
+    <h2>Selection Statements</h2>
+    <span class="part-line"></span>
+  </div>
+  <p class="part-desc">Selection statements let a program choose which block of code to run based on a condition — the code branches instead of running top to bottom.</p>
+
+  <section class="op-group" id="if">
+    <div class="group-head"><span class="group-index">1.1</span><h3 class="group-title">if statement</h3></div>
+    <p class="group-desc">Runs a block only when its condition evaluates to <code>true</code>. If the condition is <code>false</code>, the block is skipped entirely.</p>
+
+    <div class="flow">
+      <span class="node cond">age &gt;= 18</span>
+      <span class="arrow">→ true →</span>
+      <span class="node yes">print "Eligible to vote"</span>
+      <span class="arrow">→ continue program</span>
+    </div>
+
+    <div class="editor">
+      <div class="editor-bar"><span class="fname">IfDemo.java</span><span class="fname">JDK 17</span></div>
+      <div class="editor-body">
+        <div class="gutter">1
+2
+3
+4
+5
+6
+7
+8</div>
+        <div class="code-lines"><span class="kw">public</span> <span class="ty">class</span> <span class="fn">IfDemo</span> {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+        <span class="kw">int</span> age = <span class="num">20</span>;
+
+        <span class="kw">if</span> (age &gt;= <span class="num">18</span>) {
+            <span class="ty">System</span>.out.println(<span class="str">"Eligible to vote"</span>);
+        }
+    }
+}</div>
+      </div>
+      <div class="console"><span class="label">Console output</span><span class="prompt">$</span> <span class="out">Eligible to vote</span></div>
+    </div>
+  </section>
+
+  <section class="op-group" id="ifelse">
+    <div class="group-head"><span class="group-index">1.2</span><h3 class="group-title">if-else statement</h3></div>
+    <p class="group-desc">Adds a fallback: one block runs when the condition is <code>true</code>, the other runs when it's <code>false</code>. Exactly one branch always executes.</p>
+
+    <div class="flow">
+      <span class="node cond">num % 2 == 0</span>
+      <span class="arrow">true →</span>
+      <span class="node yes">"Even"</span>
+      <span class="arrow" style="margin-left:8px;">false →</span>
+      <span class="node no">"Odd"</span>
+    </div>
+
+    <div class="editor">
+      <div class="editor-bar"><span class="fname">IfElseDemo.java</span><span class="fname">JDK 17</span></div>
+      <div class="editor-body">
+        <div class="gutter">1
+2
+3
+4
+5
+6
+7
+8
+9
+10</div>
+        <div class="code-lines"><span class="kw">public</span> <span class="ty">class</span> <span class="fn">IfElseDemo</span> {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+        <span class="kw">int</span> num = <span class="num">7</span>;
+
+        <span class="kw">if</span> (num % <span class="num">2</span> == <span class="num">0</span>) {
+            <span class="ty">System</span>.out.println(num + <span class="str">" is Even"</span>);
+        } <span class="kw">else</span> {
+            <span class="ty">System</span>.out.println(num + <span class="str">" is Odd"</span>);
+        }
+    }
+}</div>
+      </div>
+      <div class="console"><span class="label">Console output</span><span class="prompt">$</span> <span class="out">7 is Odd</span></div>
+    </div>
+  </section>
+
+  <section class="op-group" id="elseif">
+    <div class="group-head"><span class="group-index">1.3</span><h3 class="group-title">else-if ladder</h3></div>
+    <p class="group-desc">Chains several conditions in order. Java tests them top to bottom and runs the first one that's <code>true</code> — everything after that is skipped.</p>
+
+    <div class="editor">
+      <div class="editor-bar"><span class="fname">GradeDemo.java</span><span class="fname">JDK 17</span></div>
+      <div class="editor-body">
+        <div class="gutter">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13</div>
+        <div class="code-lines"><span class="kw">public</span> <span class="ty">class</span> <span class="fn">GradeDemo</span> {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+        <span class="kw">int</span> marks = <span class="num">76</span>;
+
+        <span class="kw">if</span> (marks &gt;= <span class="num">90</span>) {
+            <span class="ty">System</span>.out.println(<span class="str">"Grade: A"</span>);
+        } <span class="kw">else</span> <span class="kw">if</span> (marks &gt;= <span class="num">75</span>) {
+            <span class="ty">System</span>.out.println(<span class="str">"Grade: B"</span>);
+        } <span class="kw">else</span> <span class="kw">if</span> (marks &gt;= <span class="num">60</span>) {
+            <span class="ty">System</span>.out.println(<span class="str">"Grade: C"</span>);
+        } <span class="kw">else</span> {
+            <span class="ty">System</span>.out.println(<span class="str">"Grade: F"</span>);
+        }
+    }
+}</div>
+      </div>
+      <div class="console"><span class="label">Console output</span><span class="prompt">$</span> <span class="out">Grade: B</span></div>
+    </div>
+    <div class="note"><b>Note:</b> Since 76 satisfies <code>marks &gt;= 75</code>, Java stops there — it never checks <code>marks &gt;= 60</code>, even though that's also true.</div>
+  </section>
+
+  <section class="op-group" id="switch">
+    <div class="group-head"><span class="group-index">1.4</span><h3 class="group-title">switch statement</h3></div>
+    <p class="group-desc">Matches one variable against several constant values. Cleaner than a long else-if ladder when you're checking a single value against many possibilities. Don't forget <code>break</code> — without it, execution "falls through" into the next case.</p>
+
+    <div class="editor">
+      <div class="editor-bar"><span class="fname">DayDemo.java</span><span class="fname">JDK 17</span></div>
+      <div class="editor-body">
+        <div class="gutter">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18</div>
+        <div class="code-lines"><span class="kw">public</span> <span class="ty">class</span> <span class="fn">DayDemo</span> {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+        <span class="kw">int</span> day = <span class="num">3</span>;
+        <span class="ty">String</span> name;
+
+        <span class="kw">switch</span> (day) {
+            <span class="kw">case</span> <span class="num">1</span>:  name = <span class="str">"Monday"</span>;  <span class="kw">break</span>;
+            <span class="kw">case</span> <span class="num">2</span>:  name = <span class="str">"Tuesday"</span>; <span class="kw">break</span>;
+            <span class="kw">case</span> <span class="num">3</span>:  name = <span class="str">"Wednesday"</span>; <span class="kw">break</span>;
+            <span class="kw">case</span> <span class="num">4</span>:  name = <span class="str">"Thursday"</span>; <span class="kw">break</span>;
+            <span class="kw">case</span> <span class="num">5</span>:  name = <span class="str">"Friday"</span>;  <span class="kw">break</span>;
+            <span class="kw">default</span>: name = <span class="str">"Weekend"</span>; <span class="kw">break</span>;
+        }
+
+        <span class="ty">System</span>.out.println(<span class="str">"Day: "</span> + name);
+    }
+}</div>
+      </div>
+      <div class="console"><span class="label">Console output</span><span class="prompt">$</span> <span class="out">Day: Wednesday</span></div>
+    </div>
+    <div class="note"><b>Modern tip:</b> Since Java 14, arrow-style switch (<code>case 3 -> "Wednesday";</code>) skips the fall-through problem entirely, since each branch is isolated by default.</div>
+  </section>
+
+  <!-- ============ PART 2: ITERATION ============ -->
+  <div class="part-divider">
+    <span class="part-num">PART 02</span>
+    <h2>Iteration Statements</h2>
+    <span class="part-line"></span>
+  </div>
+  <p class="part-desc">Iteration statements — loops — repeat a block of code while a condition holds, so you don't have to write the same lines over and over.</p>
+
+  <section class="op-group" id="for">
+    <div class="group-head"><span class="group-index">2.1</span><h3 class="group-title">for loop</h3></div>
+    <p class="group-desc">Best when you know how many times you want to repeat. It bundles initialization, condition, and update into one line: <code>for (init; condition; update)</code>.</p>
+
+    <div class="loop-viz">
+      <div class="row">
+        <span class="tag hit">i=1</span><span class="tag hit">i=2</span><span class="tag hit">i=3</span><span class="tag hit">i=4</span><span class="tag hit">i=5</span><span class="tag stop">i=6 → stop</span>
+      </div>
+      <div class="caption">condition i &lt;= 5 checked before every iteration; update i++ runs after each pass</div>
+    </div>
+
+    <div class="editor">
+      <div class="editor-bar"><span class="fname">ForDemo.java</span><span class="fname">JDK 17</span></div>
+      <div class="editor-body">
+        <div class="gutter">1
+2
+3
+4
+5
+6
+7</div>
+        <div class="code-lines"><span class="kw">public</span> <span class="ty">class</span> <span class="fn">ForDemo</span> {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+        <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt;= <span class="num">5</span>; i++) {
+            <span class="ty">System</span>.out.println(<span class="str">"i = "</span> + i);
+        }
+    }
+}</div>
+      </div>
+      <div class="console">
+        <span class="label">Console output</span>
+        <span class="prompt">$</span> <span class="out">i = 1</span><br><span class="prompt">$</span> <span class="out">i = 2</span><br><span class="prompt">$</span> <span class="out">i = 3</span><br><span class="prompt">$</span> <span class="out">i = 4</span><br><span class="prompt">$</span> <span class="out">i = 5</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="op-group" id="while">
+    <div class="group-head"><span class="group-index">2.2</span><h3 class="group-title">while loop</h3></div>
+    <p class="group-desc">Checks the condition <em>before</em> each iteration. Best when you don't know the exact number of repetitions in advance — the loop can run zero times if the condition starts out false.</p>
+
+    <div class="editor">
+      <div class="editor-bar"><span class="fname">WhileDemo.java</span><span class="fname">JDK 17</span></div>
+      <div class="editor-body">
+        <div class="gutter">1
+2
+3
+4
+5
+6
+7
+8</div>
+        <div class="code-lines"><span class="kw">public</span> <span class="ty">class</span> <span class="fn">WhileDemo</span> {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+        <span class="kw">int</span> count = <span class="num">1</span>;
+        <span class="kw">while</span> (count &lt;= <span class="num">5</span>) {
+            <span class="ty">System</span>.out.println(<span class="str">"count = "</span> + count);
+            count++;
+        }
+    }
+}</div>
+      </div>
+      <div class="console">
+        <span class="label">Console output</span>
+        <span class="prompt">$</span> <span class="out">count = 1</span><br><span class="prompt">$</span> <span class="out">count = 2</span><br><span class="prompt">$</span> <span class="out">count = 3</span><br><span class="prompt">$</span> <span class="out">count = 4</span><br><span class="prompt">$</span> <span class="out">count = 5</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="op-group" id="dowhile">
+    <div class="group-head"><span class="group-index">2.3</span><h3 class="group-title">do-while loop</h3></div>
+    <p class="group-desc">Checks the condition <em>after</em> each iteration, so the body always runs at least once — even if the condition is false from the start.</p>
+
+    <div class="editor">
+      <div class="editor-bar"><span class="fname">DoWhileDemo.java</span><span class="fname">JDK 17</span></div>
+      <div class="editor-body">
+        <div class="gutter">1
+2
+3
+4
+5
+6
+7
+8
+9</div>
+        <div class="code-lines"><span class="kw">public</span> <span class="ty">class</span> <span class="fn">DoWhileDemo</span> {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+        <span class="kw">int</span> num = <span class="num">10</span>;
+        <span class="kw">do</span> {
+            <span class="ty">System</span>.out.println(<span class="str">"num = "</span> + num);
+            num++;
+        } <span class="kw">while</span> (num &lt; <span class="num">5</span>);
+    }
+}</div>
+      </div>
+      <div class="console"><span class="label">Console output</span><span class="prompt">$</span> <span class="out">num = 10</span></div>
+    </div>
+    <div class="note"><b>Note:</b> Even though <code>num &lt; 5</code> is false immediately (10 is not less than 5), the body still runs once before the condition is ever checked — that's the defining trait of <code>do-while</code>.</div>
+  </section>
+
+  <section class="op-group" id="foreach">
+    <div class="group-head"><span class="group-index">2.4</span><h3 class="group-title">for-each (enhanced for) loop</h3></div>
+    <p class="group-desc">Walks through every element of an array or collection without needing an index variable. Cleaner and safer when you just need each value, not its position.</p>
+
+    <div class="editor">
+      <div class="editor-bar"><span class="fname">ForEachDemo.java</span><span class="fname">JDK 17</span></div>
+      <div class="editor-body">
+        <div class="gutter">1
+2
+3
+4
+5
+6
+7
+8</div>
+        <div class="code-lines"><span class="kw">public</span> <span class="ty">class</span> <span class="fn">ForEachDemo</span> {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+        <span class="kw">int</span>[] scores = { <span class="num">85</span>, <span class="num">92</span>, <span class="num">78</span>, <span class="num">64</span> };
+        <span class="kw">for</span> (<span class="kw">int</span> score : scores) {
+            <span class="ty">System</span>.out.println(<span class="str">"Score: "</span> + score);
+        }
+    }
+}</div>
+      </div>
+      <div class="console">
+        <span class="label">Console output</span>
+        <span class="prompt">$</span> <span class="out">Score: 85</span><br><span class="prompt">$</span> <span class="out">Score: 92</span><br><span class="prompt">$</span> <span class="out">Score: 78</span><br><span class="prompt">$</span> <span class="out">Score: 64</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PART 3: JUMP ============ -->
+  <div class="part-divider">
+    <span class="part-num">PART 03</span>
+    <h2>Jump Statements</h2>
+    <span class="part-line"></span>
+  </div>
+  <p class="part-desc">Jump statements interrupt the normal flow of a loop or method — to exit early, skip ahead, or hand back a result.</p>
+
+  <section class="op-group" id="break">
+    <div class="group-head"><span class="group-index">3.1</span><h3 class="group-title">break statement</h3></div>
+    <p class="group-desc">Immediately exits the nearest enclosing loop or switch. Nothing after <code>break</code> in that iteration runs, and the loop doesn't continue.</p>
+
+    <div class="loop-viz">
+      <div class="row">
+        <span class="tag hit">i=1</span><span class="tag hit">i=2</span><span class="tag hit">i=3</span><span class="tag stop">i=4 → break</span><span class="tag skip">i=5</span><span class="tag skip">i=6</span>
+      </div>
+      <div class="caption">loop exits the moment i == 4 — the remaining iterations never run</div>
+    </div>
+
+    <div class="editor">
+      <div class="editor-bar"><span class="fname">BreakDemo.java</span><span class="fname">JDK 17</span></div>
+      <div class="editor-body">
+        <div class="gutter">1
+2
+3
+4
+5
+6
+7
+8
+9</div>
+        <div class="code-lines"><span class="kw">public</span> <span class="ty">class</span> <span class="fn">BreakDemo</span> {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+        <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt;= <span class="num">6</span>; i++) {
+            <span class="kw">if</span> (i == <span class="num">4</span>) {
+                <span class="kw">break</span>;   <span class="cm">// exit the loop entirely</span>
+            }
+            <span class="ty">System</span>.out.println(<span class="str">"i = "</span> + i);
+        }
+    }
+}</div>
+      </div>
+      <div class="console">
+        <span class="label">Console output</span>
+        <span class="prompt">$</span> <span class="out">i = 1</span><br><span class="prompt">$</span> <span class="out">i = 2</span><br><span class="prompt">$</span> <span class="out">i = 3</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="op-group" id="continue">
+    <div class="group-head"><span class="group-index">3.2</span><h3 class="group-title">continue statement</h3></div>
+    <p class="group-desc">Skips the rest of the current iteration and jumps straight to the loop's next check — the loop keeps running, it just skips one pass.</p>
+
+    <div class="loop-viz">
+      <div class="row">
+        <span class="tag hit">i=1</span><span class="tag hit">i=2</span><span class="tag skip">i=3 → skipped</span><span class="tag hit">i=4</span><span class="tag hit">i=5</span>
+      </div>
+      <div class="caption">continue fires when i == 3, so that pass prints nothing — the loop still finishes</div>
+    </div>
+
+    <div class="editor">
+      <div class="editor-bar"><span class="fname">ContinueDemo.java</span><span class="fname">JDK 17</span></div>
+      <div class="editor-body">
+        <div class="gutter">1
+2
+3
+4
+5
+6
+7
+8
+9</div>
+        <div class="code-lines"><span class="kw">public</span> <span class="ty">class</span> <span class="fn">ContinueDemo</span> {
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+        <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt;= <span class="num">5</span>; i++) {
+            <span class="kw">if</span> (i == <span class="num">3</span>) {
+                <span class="kw">continue</span>;   <span class="cm">// skip this iteration only</span>
+            }
+            <span class="ty">System</span>.out.println(<span class="str">"i = "</span> + i);
+        }
+    }
+}</div>
+      </div>
+      <div class="console">
+        <span class="label">Console output</span>
+        <span class="prompt">$</span> <span class="out">i = 1</span><br><span class="prompt">$</span> <span class="out">i = 2</span><br><span class="prompt">$</span> <span class="out">i = 4</span><br><span class="prompt">$</span> <span class="out">i = 5</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="op-group" id="return">
+    <div class="group-head"><span class="group-index">3.3</span><h3 class="group-title">return statement</h3></div>
+    <p class="group-desc">Exits the current method immediately, optionally handing a value back to whoever called it. Any code written after <code>return</code> in that method never executes.</p>
+
+    <div class="editor">
+      <div class="editor-bar"><span class="fname">ReturnDemo.java</span><span class="fname">JDK 17</span></div>
+      <div class="editor-body">
+        <div class="gutter">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11</div>
+        <div class="code-lines"><span class="kw">public</span> <span class="ty">class</span> <span class="fn">ReturnDemo</span> {
+
+    <span class="kw">static</span> <span class="kw">int</span> <span class="fn">square</span>(<span class="kw">int</span> n) {
+        <span class="kw">return</span> n * n;   <span class="cm">// hands the value back and exits</span>
+    }
+
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+        <span class="kw">int</span> result = <span class="fn">square</span>(<span class="num">6</span>);
+        <span class="ty">System</span>.out.println(<span class="str">"Result: "</span> + result);
+    }
+}</div>
+      </div>
+      <div class="console"><span class="label">Console output</span><span class="prompt">$</span> <span class="out">Result: 36</span></div>
+    </div>
+  </section>
+
+  <section class="op-group" style="border-bottom:none;">
+    <div class="group-head"><span class="group-index">↳</span><h3 class="group-title">break vs continue vs return</h3></div>
+    <table class="cmp">
+      <tr><th>Statement</th><th>Effect</th><th>Scope of effect</th></tr>
+      <tr><td class="opsym">break</td><td>Exits the loop/switch immediately</td><td>Nearest enclosing loop or switch</td></tr>
+      <tr><td class="opsym">continue</td><td>Skips to the next iteration</td><td>Nearest enclosing loop</td></tr>
+      <tr><td class="opsym">return</td><td>Exits the entire method, optionally with a value</td><td>Whole method, even inside nested loops</td></tr>
+    </table>
+  </section>
+
+  <footer>
+    // built for a quick, runnable pass through Java's control flow
+  </footer>
+
+</div>
+</body>
+</html>
